@@ -10,7 +10,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="List des Membres"
+        android:text="Liste des Membres"
         android:textSize="20dp"
         android:layout_margin="20dp"
         android:textColor="#000"

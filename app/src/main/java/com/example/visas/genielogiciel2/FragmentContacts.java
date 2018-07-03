@@ -13,8 +13,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.visas.genielogiciel2.Model.DAO.Contact_DAO;
+import com.example.visas.genielogiciel2.Model.Principal.Contact;
 
 import java.util.ArrayList;
+
+import static android.widget.Toast.LENGTH_LONG;
 
 /**
  * Created by visas on 5/10/18.
@@ -23,17 +29,17 @@ import java.util.ArrayList;
 public class FragmentContacts extends Fragment {
 
     View view;
-
+    public static boolean onresu=false;
     private RecyclerView cRecyclerView;
     private RecyclerView.Adapter cAdapter;
     private RecyclerView.LayoutManager cLayoutManager;
     private FloatingActionButton fab;
-
+    private Contact_DAO contact_dao;
     private Dialog newContactDialog, editContactDialog;
     private Button cancelButton, saveButton;
     private EditText nameField, numberField;
 
-    private ArrayList<ContactsDataProvider> contactsList;
+    private ArrayList<Contact> contactsList;
 
     public FragmentContacts() {
     }
@@ -45,8 +51,6 @@ public class FragmentContacts extends Fragment {
         view = inflater.inflate(R.layout.contacts_fragment, container, false);
 
        cRecyclerView = view.findViewById(R.id.contacts_recycler_view);
-
-        fillContactsList();
 
         cAdapter = new ContactsRecyclerAdapter(contactsList);
 
@@ -71,30 +75,29 @@ public class FragmentContacts extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        contact_dao=new Contact_DAO(getContext());
+        contactsList=contact_dao.selectionnerTousLesContacts();
     }
 
-    private void fillContactsList(){
-        contactsList = new ArrayList<>();
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(onresu){
 
-        contactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        contactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        contactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        contactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        contactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        contactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        contactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        contactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        contactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
+            cAdapter = new ContactsRecyclerAdapter(contact_dao.selectionnerTousLesContacts());
+            cRecyclerView.setAdapter(cAdapter);
+
+        }
 
     }
-
     private void buildNewContactDialog(){
 
         newContactDialog = new Dialog(getContext());
         newContactDialog.setContentView(R.layout.new_contact_dialog);
 
         TextView heading = newContactDialog.findViewById(R.id.contact_dialog_heading);
-
+        final TextView nom= newContactDialog.findViewById(R.id.new_contact_name);
+        final TextView numero=newContactDialog.findViewById(R.id.new_contact_number);
         saveButton = newContactDialog.findViewById(R.id.new_contact_save_btn);
         cancelButton = newContactDialog.findViewById(R.id.new_contact_cancel_btn);
 
@@ -105,7 +108,10 @@ public class FragmentContacts extends Fragment {
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveContact();
+                Contact contact=new Contact(nom.getText().toString(),Integer.parseInt(numero.getText().toString()));
+                if(saveContact(contact)){
+                    Toast.makeText(getActivity(),"Contact "+contact.getContactName()+" Enregistré avec succès", LENGTH_LONG).show();
+                }
                 newContactDialog.dismiss();
             }
         });
@@ -120,9 +126,17 @@ public class FragmentContacts extends Fragment {
         newContactDialog.show();
     }
 
-    private void saveContact(){
+    private boolean saveContact(Contact contact){
+
+        long id=contact_dao.enregisterContact(contact);
 
         //Code to save contact.
-        cAdapter.notifyDataSetChanged();
+        if(id!=0) {
+            contactsList.add(contact);
+            cAdapter.notifyDataSetChanged();
+        }
+        return (id!=0);
     }
+
+
 }

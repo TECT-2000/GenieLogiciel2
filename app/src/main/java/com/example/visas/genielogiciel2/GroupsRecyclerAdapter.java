@@ -8,19 +8,19 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.visas.genielogiciel2.Model.Principal.Groupe;
+
 import java.util.ArrayList;
 
-/**
- * Created by visas on 5/16/18.
- */
+
 
 public class GroupsRecyclerAdapter extends RecyclerView.Adapter<GroupsRecyclerAdapter.GroupViewHolder> {
 
-    private ArrayList<GroupsDataProvider> groupsDataList;
+    private ArrayList<Groupe> groupsDataList;
     public static final String GROUP_INITIALS = "com.example.visas.GROUP_INITIALS";
     public static final String GROUP_NAME = "com.example.visas.GROUP_NAME";
 
-    public GroupsRecyclerAdapter(ArrayList<GroupsDataProvider> groupsDataList) {
+    public GroupsRecyclerAdapter(ArrayList<Groupe> groupsDataList) {
         this.groupsDataList = groupsDataList;
     }
 
@@ -55,7 +55,11 @@ public class GroupsRecyclerAdapter extends RecyclerView.Adapter<GroupsRecyclerAd
 
         holder.groupInitials.setText(groupsDataList.get(position).getGroupInitials());
         holder.groupName.setText(groupsDataList.get(position).getGroupName());
-        holder.groupSize.setText(groupsDataList.get(position).groupSizeToString());
+        if(groupsDataList.get(position).getContacts()!=null){
+            holder.groupSize.setText(String.valueOf(groupsDataList.get(position).getContacts().size())+" membre");
+        }
+        else
+            holder.groupSize.setText(groupsDataList.get(position).getGroupSize());
     }
 
     @Override

@@ -14,7 +14,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Selectionez les contacts a ajouter                                        "
+            android:text="Selectionez les contacts à ajouter                                        "
             android:textSize="15dp"
             android:maxLines="1"
             android:textColor="#000"

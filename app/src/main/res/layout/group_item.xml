@@ -32,7 +32,7 @@
     </LinearLayout>
 
     <android.support.v7.widget.AppCompatCheckBox
-        android:id="@+id/checkbox"
+        android:id="@+id/groupe_checkbox"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_gravity="right|center"

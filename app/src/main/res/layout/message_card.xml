@@ -33,7 +33,7 @@
             </LinearLayout>-->
 
             <com.example.visas.genielogiciel2.CircularTextView
-                android:id="@+id/group_initials"
+                android:id="@+id/message_initials"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:text="AEE"

@@ -44,6 +44,7 @@
         android:text="Initiales (3 characteres maximum)"
         android:textSize="15dp"
         android:paddingLeft="20dp"
+        android:maxLength="3"
         android:textColor="#000"
         android:paddingTop="15dp"/>
 

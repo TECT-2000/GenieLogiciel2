@@ -3,8 +3,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.visas.genielogiciel2.MainActivity">
     <item
-        android:id="@+id/action_settings"
+    android:id="@+id/action_restaurer"
+    android:orderInCategory="100"
+    android:title="@string/action_restaurer"
+    app:showAsAction="never"
+        android:icon="@drawable/ic_file_upload"/>
+    <item
+        android:id="@+id/action_sauvegarder"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/action_sauvegarder"
+        app:showAsAction="never"
+        android:icon="@drawable/ic_file_download"/>
+    <item
+        android:id="@+id/action_parametres"
+        android:icon="@drawable/ic_settings"
+        android:orderInCategory="100"
+        android:title="Paramètres"
+        android:visible="true"
         app:showAsAction="never" />
 </menu>

@@ -1,6 +1,5 @@
 package com.example.visas.genielogiciel2;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,8 +15,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.example.visas.genielogiciel2.Model.DAO.Contact_DAO;
+import com.example.visas.genielogiciel2.Model.DAO.Groupe_DAO;
+import com.example.visas.genielogiciel2.Model.Principal.Contact;
+import com.example.visas.genielogiciel2.Model.Principal.Groupe;
 
 import java.util.ArrayList;
 
@@ -25,15 +29,16 @@ public class ManageGroupActivity extends AppCompatActivity {
 
     View view;
     ActionBar actionBar;
-
+    private Groupe_DAO groupe_dao;
+    private Contact_DAO contact_dao;
     RecyclerView recyclerView, dialogRecyclerView;
     RecyclerView.Adapter adapter, dialogAdapter;
     RecyclerView.LayoutManager layoutManager, dialogLayoutManager;
 
-    ArrayList<ContactsDataProvider> arrayList, addContactsList;
+    ArrayList<Contact> arrayList, addContactsList;
 
     CircularTextView groupInitials;
-    TextView groupName;
+    TextView nomGroupe;
 
     AlertDialog.Builder deleteGroupConfirmationDialog;
 
@@ -42,10 +47,12 @@ public class ManageGroupActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_group);
 
+        groupe_dao=new Groupe_DAO(getApplicationContext());
+        contact_dao=new Contact_DAO(getApplicationContext());
         view = LayoutInflater.from(this).inflate(R.layout.manage_group_action_bar, null);
 
         groupInitials = view.findViewById(R.id.manage_group_initials);
-        groupName = view.findViewById(R.id.manage_group_name);
+        nomGroupe = view.findViewById(R.id.manage_group_name);
 
         actionBar = getSupportActionBar();
 
@@ -55,17 +62,18 @@ public class ManageGroupActivity extends AppCompatActivity {
 
         getGroupMembers();
 
+
         Intent intent = getIntent();
 
         String groupInitials = intent.getStringExtra(GroupsRecyclerAdapter.GROUP_INITIALS);
         String groupName = intent.getStringExtra(GroupsRecyclerAdapter.GROUP_NAME);
 
         this.groupInitials.setText(groupInitials);
-        this.groupName.setText(groupName);
+        this.nomGroupe.setText(groupName);
 
         recyclerView = (RecyclerView) findViewById(R.id.manage_group_recycler_view);
 
-        adapter = new ManageGroupRecyclerAdapter(arrayList, false);
+        adapter = new ManageGroupRecyclerAdapter(arrayList, false,nomGroupe.getText().toString());
         layoutManager = new LinearLayoutManager(this);
 
         recyclerView.setAdapter(adapter);
@@ -113,37 +121,15 @@ public class ManageGroupActivity extends AppCompatActivity {
     private void fillAddContactsList(){
 
         addContactsList = new ArrayList<>();
-
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        addContactsList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
+        addContactsList = contact_dao.selectionnerTousLesContacts();
 
     }
 
     //code to get group members
     private void getGroupMembers(){
 
-        arrayList = new ArrayList<>();
-
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
-        arrayList.add(new ContactsDataProvider("Tsebo Mike", 677898232));
+            arrayList = new ArrayList<>();
+            arrayList=contact_dao.selectionnerContactsGroupe(groupe_dao.selectionnerIdGroupe(getIntent().getStringExtra(GroupsRecyclerAdapter.GROUP_NAME)));
 
     }
 
@@ -155,7 +141,7 @@ public class ManageGroupActivity extends AppCompatActivity {
 
         dialogRecyclerView = dialog.findViewById(R.id.add_contacts_dialog_recycler_view);
 
-        dialogAdapter = new ManageGroupRecyclerAdapter(addContactsList, true);
+        dialogAdapter = new ManageGroupRecyclerAdapter(addContactsList, true,this.nomGroupe.getText().toString());
         dialogLayoutManager = new LinearLayoutManager(this);
         dialogLayoutManager.setAutoMeasureEnabled(false);
 
@@ -177,7 +163,10 @@ public class ManageGroupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Code to add contacts
+                ArrayList<Contact> contacts=((ManageGroupRecyclerAdapter)dialogRecyclerView.getAdapter()).getCheckedContacts();
 
+                ajouterContacts(nomGroupe.getText().toString(),contacts);
+                dialog.dismiss();
             }
         });
 
@@ -193,11 +182,12 @@ public class ManageGroupActivity extends AppCompatActivity {
         Button cancelButton = dialog.findViewById(R.id.modify_group_cancel_btn);
         Button saveButton = dialog.findViewById(R.id.modify_group_save_btn);
 
-        EditText groupName = dialog.findViewById(R.id.modify_group_name);
-        EditText groupInitials = dialog.findViewById(R.id.modify_group_initials);
+        final EditText groupName = dialog.findViewById(R.id.modify_group_name);
+        final EditText initials = dialog.findViewById(R.id.modify_group_initials);
 
-        groupName.setText(this.groupName.getText());
-        groupInitials.setText(this.groupInitials.getText());
+        System.out.println(this.nomGroupe.getText().toString());
+        groupName.setText(this.nomGroupe.getText());
+        initials.setText(this.groupInitials.getText());
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -211,6 +201,15 @@ public class ManageGroupActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //Code to add contacts
 
+
+                Groupe groupe=new Groupe();
+                groupe.setGroupInitials(initials.getText().toString());
+                groupe.setGroupName(groupName.getText().toString());
+                System.out.println(groupName.getText().toString());
+                modifierGroupe(groupe);
+                nomGroupe.setText(groupName.getText().toString());
+                groupInitials.setText(initials.getText().toString());
+                dialog.dismiss();
             }
         });
 
@@ -224,14 +223,20 @@ public class ManageGroupActivity extends AppCompatActivity {
                 R.style.ThemeOverlay_AppCompat_Dialog_Alert);
 
 
-        deleteGroupConfirmationDialog.setMessage("Voulez vous vraiement suppremer le group "
-                +groupName.getText()+"?")
+        deleteGroupConfirmationDialog.setMessage("Voulez vous vraiment supprimer le groupe "
+                +nomGroupe.getText()+"?")
                 .setPositiveButton("OUI", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
                         //Code to delete contact from group
-
+                        Groupe groupe= new Groupe();
+                        groupe.setGroupName(nomGroupe.getText().toString());
+                        boolean rep=deleteGroupe(groupe);
+                        if(rep) {
+                            Toast.makeText(getApplicationContext(), "Groupe supprimé", Toast.LENGTH_LONG).show();
+                            FragmentGroups.onresu=true;
+                        }
                         finish();
 
                     }
@@ -243,5 +248,36 @@ public class ManageGroupActivity extends AppCompatActivity {
                     }
                 })
                 .show();
+    }
+
+    private boolean deleteGroupe(Groupe groupe){
+
+        long id=groupe_dao.supprimerGroupe(groupe.getGroupName());
+
+        //Code to delete groupe
+        return (id!=0);
+    }
+    private boolean modifierGroupe(Groupe groupe){
+
+        long id=groupe_dao.modifierNomGroupe(nomGroupe.getText().toString(),groupe.getGroupName(),groupe.getGroupInitials());
+
+        if(id!=0){
+            Toast.makeText(getApplicationContext(),"modification réussie",Toast.LENGTH_LONG).show();
+            FragmentGroups.onresu=true;
+            adapter.notifyDataSetChanged();
+        }
+        return (id!=0);
+    }
+    private boolean ajouterContacts(String nomGroupe,ArrayList<Contact> contacts){
+
+        int id=groupe_dao.selectionnerIdGroupe(nomGroupe);
+         long rep=groupe_dao.entregistrerContactsGroupe(contacts,id);
+         if(rep!=0) {
+             arrayList.addAll(contacts);
+             Toast.makeText(getApplicationContext(),"contacts ajoutés",Toast.LENGTH_LONG).show();
+             FragmentGroups.onresu=true;
+             adapter.notifyDataSetChanged();
+         }
+         return rep!=0;
     }
 }

@@ -45,9 +45,15 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="7"
+            android:orientation="vertical"
             android:padding="4dp"
             android:background="@drawable/customborder">
 
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Titre : "
+                android:id="@+id/message_title"/>
             <EditText
                 android:id="@+id/drafted_text"
                 android:layout_width="match_parent"

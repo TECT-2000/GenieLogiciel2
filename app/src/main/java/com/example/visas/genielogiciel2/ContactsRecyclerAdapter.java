@@ -1,6 +1,7 @@
 package com.example.visas.genielogiciel2;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
@@ -9,11 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.example.visas.genielogiciel2.Model.DAO.Contact_DAO;
+import com.example.visas.genielogiciel2.Model.Principal.Contact;
 
 import java.util.ArrayList;
 
@@ -24,14 +27,17 @@ import java.util.ArrayList;
 public class ContactsRecyclerAdapter  extends
         RecyclerView.Adapter<ContactsRecyclerAdapter.ContactsViewHolder>{
 
-    private ArrayList<ContactsDataProvider> contactsDataList;
+    private ArrayList<Contact> contactsDataList;
+    private Context context;
+    private Contact_DAO contact_dao;
     private AlertDialog.Builder deleteConfirmationDialog;
     private Dialog editContactDialog;
 
     private EditText contactName, contactNumber;
 
-    public ContactsRecyclerAdapter(ArrayList<ContactsDataProvider> contactsDataList) {
+    public ContactsRecyclerAdapter(ArrayList<Contact> contactsDataList) {
         this.contactsDataList = contactsDataList;
+
     }
 
     @Override
@@ -39,7 +45,9 @@ public class ContactsRecyclerAdapter  extends
 
         View view = LayoutInflater.from(parent.getContext())
                      .inflate(R.layout.contact_card, parent, false);
+        context=parent.getContext();
 
+        contact_dao=new Contact_DAO(parent.getContext());
         final ContactsViewHolder holder = new ContactsViewHolder(view);
         holder.deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,6 +67,8 @@ public class ContactsRecyclerAdapter  extends
                             public void onClick(DialogInterface dialog, int which) {
 
                                 //Code to delete contact from server
+                                contact_dao.supprimerContact(contactsDataList.get(holder.getAdapterPosition()));
+                                FragmentGroups.onresu=true;
 
                                 int currentPosition = holder.getAdapterPosition();
                                 contactsDataList.remove(currentPosition);
@@ -88,10 +98,11 @@ public class ContactsRecyclerAdapter  extends
     }
 
     @Override
-    public void onBindViewHolder(ContactsViewHolder holder, int position) {
+    public void onBindViewHolder(ContactsViewHolder holder, final int position) {
 
         holder.contactName.setText(contactsDataList.get(position).getContactName());
         holder.contactNumber.setText(contactsDataList.get(position).contactNumberToString());
+
     }
 
     @Override
@@ -119,7 +130,18 @@ public class ContactsRecyclerAdapter  extends
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateContactInfo(holder);
+                Contact contact=new Contact();
+                contact.setContactName(contactName.getText().toString());
+                contact.setContactNumber(contactsDataList.get(holder.getAdapterPosition()).getContactNumber());
+                long id=contact_dao.modifierNomContact(contact);
+                contact.setContactNumber(Integer.parseInt(contactNumber.getText().toString()));
+                long rep=contact_dao.modifierNumeroContact(contact);
+
+                if(id!=0 && rep!=0) {
+                    contactsDataList.set(holder.getAdapterPosition(),contact);
+                    notifyItemChanged(holder.getAdapterPosition());
+                }
+                FragmentContacts.onresu=true;
                 dialog.dismiss();
             }
         });
@@ -133,10 +155,6 @@ public class ContactsRecyclerAdapter  extends
 
         dialog.show();
 
-    }
-
-    private void updateContactInfo(ContactsViewHolder holder){
-        //code to update contact info
     }
 
     public static class ContactsViewHolder extends RecyclerView.ViewHolder{
