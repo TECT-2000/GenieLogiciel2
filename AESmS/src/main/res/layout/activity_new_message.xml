@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:paddingBottom="15dp"
+    tools:context="com.example.visas.genielogiciel2.NewMessageActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:orientation="vertical"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Selectionnez le(s) groupe(s) concerne(s)"
+            android:textAlignment="center"
+            android:textSize="15dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="10dp"
+            android:textColor="#000"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/new_message_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="7"
+            android:background="@drawable/customborder"
+            android:orientation="vertical"
+            android:padding="4dp">
+
+            <EditText
+                android:id="@+id/message_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Titre : " />
+
+            <EditText
+                android:id="@+id/drafted_text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Entrez votre message ici"
+                android:textColor="#000" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="190dp"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/clear_new_message"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/redroundedbutton"
+                android:elevation="0dp"
+                android:src="@drawable/ic_close" />
+
+            <ImageButton
+                android:id="@+id/save_new_message"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/greenroundedbutton"
+                android:elevation="0dp"
+                android:src="@drawable/ic_save" />
+
+            <ImageButton
+                android:id="@+id/send_new_message"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_margin="4dp"
+                android:background="@drawable/fadegreenroundedbutton"
+                android:elevation="0dp"
+                android:src="@drawable/ic_send" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

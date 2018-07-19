@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="Définition SIM Orange">
+        <ListPreference
+            android:key="listSim1"
+            android:dialogTitle="Choisissez une SIM"
+            android:icon="@drawable/ic_sim_card"
+            android:defaultValue="aucune"
+            android:summary="Sélectionner une SIM"
+            android:title="Choisir une SIM"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Définition SIM MTN">
+        <ListPreference
+            android:key="listSim2"
+            android:dialogTitle="Choisissez une SIM"
+            android:icon="@drawable/ic_sim_card"
+            android:defaultValue="aucune"
+            android:summary="Sélectionner une SIM"
+            android:title="Choisir une SIM"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Définition SIM Nextell">
+        <ListPreference
+            android:key="listSim3"
+            android:defaultValue="aucune"
+            android:dialogTitle="Choisissez une SIM"
+            android:summary="Sélectionner une SIM"
+            android:icon="@drawable/ic_sim_card"
+            android:title="Choisir une SIM"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Lien Serveur">
+        <EditTextPreference
+            android:key="lien_serveur"
+            android:icon="@drawable/ic_storage"
+            android:defaultValue="http://192.168.43.30/getAllUsers.php"
+            android:positiveButtonText="Valider"
+            android:negativeButtonText="annuler"
+            android:title="Lien vers le serveur"
+            android:summary="http://192.168.43.30/getAllUsers.php"/>
+    </PreferenceCategory>
+</PreferenceScreen>
