@@ -15,11 +15,14 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.SmsManager;
+import android.telephony.SubscriptionInfo;
+import android.telephony.SubscriptionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -195,9 +198,19 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessagesRecycl
                 for (Contact c : g.getContacts()) {
                     PendingIntent sentPI = PendingIntent.getBroadcast(context, 0, new Intent(SENT), 0);
                     SharedPreferences pref=context.getSharedPreferences(c.getOperateur(),Context.MODE_PRIVATE);
-                    int slot=pref.getInt("id",1);
-                    Toast.makeText(context,"Slot utilisé : "+slot+" numéro : "+c.getContactNumber(),Toast.LENGTH_LONG).show();
-                    SmsManager.getSmsManagerForSubscriptionId(slot).sendTextMessage(c.contactNumberToString(), null, "***** "+message.getMessageTitle()+" *****  \n"+message.getMessageInfo(), sentPI, null);
+                    String sim= PreferenceManager
+                            .getDefaultSharedPreferences(context)
+                            .getString(c.getOperateur(), "0");
+                    int slot=0;
+                    Toast.makeText(context,"Slot utilisé : "+sim+" numéro : "+c.getContactNumber(),Toast.LENGTH_LONG).show();
+
+                    SubscriptionManager subs = (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+                    for (SubscriptionInfo s : subs.getActiveSubscriptionInfoList()) {
+                        if(s.getDisplayName().toString().matches(sim))
+                            Toast.makeText(context,"slot : "+s.getSimSlotIndex(),Toast.LENGTH_LONG).show();
+                        slot=s.getSimSlotIndex();
+                    }
+                    SmsManager.getSmsManagerForSubscriptionId(slot).sendTextMessage(c.contactNumberToString(), null, message.getMessageInfo(), sentPI, null);
 
                 }
             }

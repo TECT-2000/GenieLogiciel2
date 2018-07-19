@@ -3,6 +3,7 @@ package com.example.visas.genielogiciel2;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
     private static final String TAG = SettingsActivity.class.getSimpleName();
+
 
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
@@ -34,7 +37,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     @SuppressLint("ValidFragment")
-    public class MainPreferenceFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener{
+    public class MainPreferenceFragment extends PreferenceFragment {
         ArrayList<String> items_puces;
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
         @Override
@@ -42,10 +45,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.preference);
 
-            // gallery EditText change listener
-            bindPreferenceSummaryToValue(findPreference("lien_serveur"));
 
-            final ListPreference lp = setListPreferenceData((ListPreference) findPreference("listSim1"), getActivity());
+
+            final ListPreference lp = setListPreferenceData((ListPreference) findPreference("Orange"), getActivity());
 
             lp.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -55,7 +57,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     return false;
                 }
             });
-            final ListPreference pref = setListPreferenceData((ListPreference) findPreference("listSim2"), getActivity());
+
+
+            final ListPreference pref = setListPreferenceData((ListPreference) findPreference("MTN"), getActivity());
 
             pref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -65,7 +69,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     return false;
                 }
             });
-            final ListPreference prefSim = setListPreferenceData((ListPreference) findPreference("listSim3"), getActivity());
+            final ListPreference prefSim = setListPreferenceData((ListPreference) findPreference("Nextell"), getActivity());
 
             prefSim.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
@@ -75,13 +79,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     return false;
                 }
             });
+            final ListPreference autre = setListPreferenceData((ListPreference) findPreference("Autre"), getActivity());
+
+            autre.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+
+                    setListPreferenceData(autre, getActivity());
+                    return false;
+                }
+            });
             setHasOptionsMenu(true);
 
             bindPreferenceSummaryToValue(lp);
-            // notification preference change listener
-            bindPreferenceSummaryToValue(findPreference("listSim1"));
-            bindPreferenceSummaryToValue(findPreference("listSim2"));
-            bindPreferenceSummaryToValue(findPreference("listSim3"));
+            bindPreferenceSummaryToValue(findPreference("lien_serveur"));
+            bindPreferenceSummaryToValue(findPreference("Orange"));
+            bindPreferenceSummaryToValue(findPreference("MTN"));
+            bindPreferenceSummaryToValue(findPreference("Nextell"));
+            bindPreferenceSummaryToValue(findPreference("Autre"));
         }
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
         protected ListPreference setListPreferenceData(ListPreference preference, Activity mActivity) {
@@ -92,6 +107,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             for (SubscriptionInfo s : subs.getActiveSubscriptionInfoList()) {
                 items_puces.add(String.valueOf(s.getDisplayName()));
             }
+            items_puces.add("Mike");
             ListPreference lp = (ListPreference) preference;
             CharSequence[] cs = items_puces.toArray(new CharSequence[items_puces.size()]);
             lp.setEntries(cs);
@@ -102,17 +118,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return lp;
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.M)
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if(key.equals("listSim1") || key.equals("listSim2") || key.equals("listSim3") ){
-                Preference pref=findPreference(key);
-                pref.setSummary(sharedPreferences.getString(key,""));
-                Toast.makeText(getContext(),"preference : "+sharedPreferences.getString(key,""),Toast.LENGTH_LONG).show();
-            }
-        }
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -129,6 +135,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 PreferenceManager
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
+
     }
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
@@ -147,7 +154,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
-
+                System.out.println(TAG+" index : "+index);
             }  else if (preference instanceof EditTextPreference) {
                 if (preference.getKey().equals("lien_serveur")) {
                     // update the changed gallery name to summary filed

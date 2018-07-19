@@ -11,6 +11,8 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.preference.PreferenceActivity;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -19,6 +21,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.telephony.SmsManager;
+import android.telephony.SubscriptionInfo;
 import android.telephony.SubscriptionManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -151,10 +154,20 @@ public class NewMessageActivity extends AppCompatActivity {
             for (Groupe g : message.getGroupes()) {
                 for (Contact c : g.getContacts()) {
                     PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(SENT), 0);
-                    SharedPreferences pref=getSharedPreferences(c.getOperateur(),0);
-                    int slot=pref.getInt("id",1);
-                    Toast.makeText(getApplicationContext(),"Slot utilisé : "+slot+" numéro : "+c.getContactNumber(),Toast.LENGTH_LONG).show();
-                    SmsManager.getSmsManagerForSubscriptionId(slot).sendTextMessage(c.contactNumberToString(), null, "***** "+message.getMessageTitle()+" *****  \n"+message.getMessageInfo(), sentPI, null);
+
+                    String sim=PreferenceManager
+                            .getDefaultSharedPreferences(getApplicationContext())
+                            .getString(c.getOperateur(), "0");
+                    int slot=0;
+                    Toast.makeText(getApplicationContext(),"Slot utilisé : "+sim+" numéro : "+c.getContactNumber(),Toast.LENGTH_LONG).show();
+
+                    SubscriptionManager subs = (SubscriptionManager) getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+                    for (SubscriptionInfo s : subs.getActiveSubscriptionInfoList()) {
+                        if(s.getDisplayName().toString().matches(sim))
+                            Toast.makeText(getApplicationContext(),"slot : "+s.getSimSlotIndex(),Toast.LENGTH_LONG).show();
+                            slot=s.getSimSlotIndex();
+                    }
+                    SmsManager.getSmsManagerForSubscriptionId(slot).sendTextMessage(c.contactNumberToString(), null, message.getMessageInfo(), sentPI, null);
 
                 }
             }

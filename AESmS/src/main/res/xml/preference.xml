@@ -1,30 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="Définition SIM Orange">
+    <PreferenceCategory android:title="Opérateur Orange">
         <ListPreference
-            android:key="listSim1"
+            android:key="Orange"
             android:dialogTitle="Choisissez une SIM"
             android:icon="@drawable/ic_sim_card"
             android:defaultValue="aucune"
             android:summary="Sélectionner une SIM"
             android:title="Choisir une SIM"/>
     </PreferenceCategory>
-    <PreferenceCategory android:title="Définition SIM MTN">
+    <PreferenceCategory android:title="Opérateur MTN">
         <ListPreference
-            android:key="listSim2"
+            android:key="MTN"
             android:dialogTitle="Choisissez une SIM"
             android:icon="@drawable/ic_sim_card"
             android:defaultValue="aucune"
             android:summary="Sélectionner une SIM"
             android:title="Choisir une SIM"/>
     </PreferenceCategory>
-    <PreferenceCategory android:title="Définition SIM Nextell">
+    <PreferenceCategory android:title="Opérateur Nextell">
         <ListPreference
-            android:key="listSim3"
+            android:key="Nextell"
             android:defaultValue="aucune"
             android:dialogTitle="Choisissez une SIM"
             android:summary="Sélectionner une SIM"
+            android:icon="@drawable/ic_sim_card"
+            android:title="Choisir une SIM"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="Opérateur Autre">
+        <ListPreference
+            android:key="Autre"
+            android:dialogTitle="Choisissez une SIM"
+            android:summary="Sélectionner une SIM pour envoyer les messages au contact dont l'opérateur est Autre"
             android:icon="@drawable/ic_sim_card"
             android:title="Choisir une SIM"/>
     </PreferenceCategory>
