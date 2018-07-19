@@ -82,7 +82,6 @@ public class ContactsRecyclerAdapter  extends
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
 
-                                //Code to delete contact from server
                                 contact_dao.supprimerContact(contactsDataList.get(holder.getAdapterPosition()));
                                 FragmentGroups.onresu=true;
 
@@ -101,12 +100,11 @@ public class ContactsRecyclerAdapter  extends
                         .show();
             }
         });
-
         holder.contactsCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(parent.getContext());
-                CharSequence colors[] = new CharSequence[]{"Ajouter à un groupe", "Modifier"};
+                CharSequence colors[] = new CharSequence[]{"Ajouter à un groupe", "Modifier",};
 
                 builder.setTitle("Choisir une option");
                 builder.setItems(colors, new DialogInterface.OnClickListener() {

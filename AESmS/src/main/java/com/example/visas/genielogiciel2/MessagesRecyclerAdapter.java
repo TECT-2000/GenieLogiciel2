@@ -30,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -50,10 +51,11 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessagesRecycl
 
     private ArrayList<Message> messagesDataList;
 
-    RecyclerView recyclerView, dialogRecyclerView;
+    RecyclerView  dialogRecyclerView;
     RecyclerView.LayoutManager layoutManager, dialogLayoutManager;
     RecyclerView.Adapter adapter;
     private ArrayList<Groupe> addGroupeList;
+    private android.support.v7.app.AlertDialog.Builder deleteConfirmationDialog;
     public Context context;
     private Message_DAO message_dao;
     private Groupe_DAO groupe_dao;
@@ -83,7 +85,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessagesRecycl
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(parent.getContext());
                 if(!messagesDataList.get(vh.getAdapterPosition()).isMessageIsSent()) {
-                    CharSequence colors[] = new CharSequence[]{"Envoyer","Editer", "supprimer","Copier"};
+                    CharSequence colors[] = new CharSequence[]{"Envoyer","Editer", "supprimer"};
 
                     builder.setTitle("Choisir une option");
                     builder.setItems(colors, new DialogInterface.OnClickListener() {
@@ -100,11 +102,6 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessagesRecycl
                                 message_dao.supprimerMessage(messagesDataList.get(vh.getAdapterPosition()));
                                 messagesDataList.remove(vh.getAdapterPosition());
                                 notifyItemRemoved(vh.getAdapterPosition());
-                            }
-                            else{
-                                /*à compléter
-                                code pour copier un message
-                                 */
                             }
                         }
                     });
@@ -302,14 +299,49 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessagesRecycl
 
         ImageButton clearDraft = draftDialog.findViewById(R.id.clear_draft);
         ImageButton saveDraft = draftDialog.findViewById(R.id.save_draft);
-        ImageButton sendDraft = draftDialog.findViewById(R.id.send_draft);
+        ImageView deleteButton=draftDialog.findViewById(R.id.dialog_delete_draft);
 
         groupInitials.setText(dataProvider.getMessageTitle().substring(0,3));
         groupName.setText(dataProvider.getMessageTitle());
         textDetails.setText(dataProvider.getMessageInfo());
         textDetails.setSelection(textDetails.getText().length());
 
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    deleteConfirmationDialog = new android.support.v7.app.AlertDialog.Builder(context,
+                            R.style.ThemeOverlay_AppCompat_Dialog_Alert);
+                }
+                else{
+                    deleteConfirmationDialog = new android.support.v7.app.AlertDialog.Builder(context);
+                }
+
+                deleteConfirmationDialog.setMessage("Voulez vous vraiment suprimmer "+vh.messageTitle.getText()+" parmi vos messages ?")
+                        .setPositiveButton("OUI", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                message_dao.supprimerMessage(messagesDataList.get(vh.getAdapterPosition()));
+                                FragmentMessages.onresu=true;
+
+                                int currentPosition = vh.getAdapterPosition();
+                                messagesDataList.remove(currentPosition);
+                                notifyItemRemoved(currentPosition);
+                                notifyItemRangeChanged(currentPosition, messagesDataList.size());
+                                draftDialog.dismiss();
+                            }
+                        })
+                        .setNegativeButton("NON", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+            }
+        });
 //        Setting action events for Dialog buttons
         clearDraft.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -331,13 +363,7 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessagesRecycl
             }
         });
 
-        sendDraft.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Code to send draft
-            displayAddGroupeDialog(vh.getAdapterPosition());
-            }
-        });
+
 
         draftDialog.show();
 
@@ -370,7 +396,6 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessagesRecycl
             messageTitle = view.findViewById(R.id.message_title);
             messageInfo = view.findViewById(R.id.message_info);
             messageTime = view.findViewById(R.id.message_time);
-
         }
 
     }
