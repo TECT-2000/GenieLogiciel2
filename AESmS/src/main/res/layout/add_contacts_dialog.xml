@@ -12,6 +12,7 @@
         android:paddingBottom="8dp"
         android:layout_weight="0">
         <TextView
+            android:id="@+id/add_textview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Selectionez les contacts à ajouter                                        "

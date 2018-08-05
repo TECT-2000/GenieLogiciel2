@@ -13,6 +13,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.preference.PreferenceManager;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
@@ -76,16 +77,17 @@ public class MainActivity extends AppCompatActivity implements Asyncable {
         viewPager = (ViewPager) findViewById(R.id.view_pager);
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        adapter.addFragment(new FragmentContacts(), "Contacts");
-        adapter.addFragment(new FragmentGroups(), "Groupes");
         adapter.addFragment(new FragmentMessages(), "Messages");
+        adapter.addFragment(new FragmentGroups(), "Groupes");
+        adapter.addFragment(new FragmentContacts(), "Contacts");
+
 
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
 
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_message);
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_message);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_group);
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_contacts_black_24dp);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_contacts_black_24dp);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setElevation(0);
@@ -275,26 +277,27 @@ public class MainActivity extends AppCompatActivity implements Asyncable {
         private void exporter(String url) {
             JSONObject[] tab = new JSONObject[200];
             try {
-
                 int id;
                 String name;
                 int i = 0;
-                for (Groupe g:groupeList) {
+                for (Groupe g : groupeList) {
                     contactList = g.getContacts();
                     name = g.getGroupName();
                     id = g.getId();
-                    for (Contact c: contactList){
+                    for (Contact c : contactList){
                         JSONObject tomJsonObj = new JSONObject();
                         tomJsonObj.put("idgroupe", id+"");
                         tomJsonObj.put("nomcontact", c.getContactName());
                         tomJsonObj.put("operateur",c.getOperateur());
                         tomJsonObj.put("nomgroupe", name);
                         tomJsonObj.put("numero", c.getContactNumber()+"");
-                        new SendToServerAsc((MainActivity) getActivity(), url, FOA_EXPORT).execute(tomJsonObj.toString());
+
                         tab[i] = tomJsonObj;
                         i++;
-                    }
+                        }
+
                 }
+                //new SendToServerAsc((MainActivity) getActivity(), url, FOA_EXPORT).execute();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -312,8 +315,10 @@ public class MainActivity extends AppCompatActivity implements Asyncable {
             ((LinearLayout) v).setOrientation(LinearLayout.VERTICAL);
             editText = new AppCompatEditText(getContext());
             ((LinearLayout) v).addView(editText);
-           SharedPreferences adress= getActivity().getSharedPreferences("serveur",0);
-            editText.setText(adress.getString("lien",""));
+           String sim= PreferenceManager
+                   .getDefaultSharedPreferences(getContext())
+                   .getString("lien_serveur", "0");
+            editText.setText(sim);
 
             AlertDialog dialog = null;
             if (getArguments().containsKey(ARG_OP))
@@ -392,8 +397,6 @@ public class MainActivity extends AppCompatActivity implements Asyncable {
             mUrl = url;
             this.code = code;
         }
-
-
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
@@ -444,7 +447,6 @@ public class MainActivity extends AppCompatActivity implements Asyncable {
         private com.venus.app.IO.Asyncable mSource;
         private String murl = null;
         private String code;
-        private String numero;
         ProgressDialog dialog;
 
         public SendToServerAsc(com.venus.app.IO.Asyncable asyncable, String url, String code){

@@ -112,7 +112,7 @@ public class ContactsRecyclerAdapter  extends
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
-                            displayAddGroupeDialog();
+                            displayAddGroupeDialog(contactsDataList.get(holder.getAdapterPosition()));
 
                         } else if (which == 1) {
                             editContactDialog = new Dialog(parent.getContext());
@@ -128,10 +128,12 @@ public class ContactsRecyclerAdapter  extends
         return holder;
     }
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void displayAddGroupeDialog(){
+    private void displayAddGroupeDialog(final Contact contact){
         fillAddGroupesList();
 
+
         final Dialog dialog = new Dialog(context);
+
         dialog.setContentView(R.layout.add_contacts_dialog);
 
         dialogRecyclerView = dialog.findViewById(R.id.add_contacts_dialog_recycler_view);
@@ -146,7 +148,9 @@ public class ContactsRecyclerAdapter  extends
 
         Button cancelButton = dialog.findViewById(R.id.add_contacts_cancel_btn);
         Button saveButton = dialog.findViewById(R.id.add_contacts_save_btn);
+        TextView titre=dialog.findViewById(R.id.add_textview);
 
+        titre.setText("Selectionnez le(s) groupe(s)                                        ");
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -157,6 +161,12 @@ public class ContactsRecyclerAdapter  extends
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ArrayList<Groupe> groupes=((ManageContactRecyclerAdapter)dialogRecyclerView.getAdapter()).getCheckedGroupes();
+                for(Groupe g : groupes){
+                        groupe_dao.enregistrerContactGroupe(contact,groupe_dao.selectionnerIdGroupe(g.getGroupName()));
+                }
+                FragmentGroups.onresu=true;
+
                 dialog.dismiss();
             }
         });
@@ -169,6 +179,7 @@ public class ContactsRecyclerAdapter  extends
 
         addGroupeList = new ArrayList<>();
         addGroupeList = groupe_dao.selectionnerGroupes();
+
 
         Toast.makeText(context,"size : "+addGroupeList.size(),Toast.LENGTH_LONG).show();
 

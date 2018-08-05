@@ -41,6 +41,7 @@ import com.example.visas.genielogiciel2.Model.Principal.Contact;
 import com.example.visas.genielogiciel2.Model.Principal.Groupe;
 import com.example.visas.genielogiciel2.Model.Principal.Message;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 /**
@@ -202,13 +203,18 @@ public class MessagesRecyclerAdapter extends RecyclerView.Adapter<MessagesRecycl
                     Toast.makeText(context,"Slot utilisé : "+sim+" numéro : "+c.getContactNumber(),Toast.LENGTH_LONG).show();
 
                     SubscriptionManager subs = (SubscriptionManager) context.getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+                    assert subs != null;
                     for (SubscriptionInfo s : subs.getActiveSubscriptionInfoList()) {
-                        if(s.getDisplayName().toString().matches(sim))
-                            Toast.makeText(context,"slot : "+s.getSimSlotIndex(),Toast.LENGTH_LONG).show();
-                        slot=s.getSimSlotIndex();
+                        if(s.getDisplayName().toString().matches(sim)){
+                            //slot=s.getSimSlotIndex();
+                            Toast.makeText(context,"slot : "+slot,Toast.LENGTH_LONG).show();
+                            SmsManager.getSmsManagerForSubscriptionId(s.getSubscriptionId()).sendTextMessage(c.contactNumberToString(), null, message.getMessageInfo(),sentPI,null);
+                        }
                     }
-                    SmsManager.getSmsManagerForSubscriptionId(slot).sendTextMessage(c.contactNumberToString(), null, message.getMessageInfo(), sentPI, null);
-
+                    /*SubscriptionManager subscriptionManager=((Activity)context).getSystemService(SubscriptionManager.class);
+                    assert subscriptionManager != null;
+                    SubscriptionInfo subscriptionInfo=subscriptionManager.getActiveSubscriptionInfoForSimSlotIndex(slot);
+                    SmsManager.getSmsManagerForSubscriptionId(subscriptionInfo.getSubscriptionId()).sendTextMessage(c.contactNumberToString(), null, message.getMessageInfo(),sentPI,null);*/
                 }
             }
             //---when the SMS has been sent---

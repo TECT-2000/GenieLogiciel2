@@ -56,6 +56,7 @@ import java.util.ArrayList;
     @Override
     public void onBindViewHolder(final GroupesViewHolder holder, final int position) {
 
+
         holder.groupinitials.setText(groupMembersList.get(position).getGroupInitials());
         holder.groupeName.setText(groupMembersList.get(position).getGroupName());
         holder.checkBox.setChecked(false);
@@ -69,7 +70,6 @@ import java.util.ArrayList;
                     liste.remove(groupMembersList.get(position));
             }
         });
-
 
     }
 

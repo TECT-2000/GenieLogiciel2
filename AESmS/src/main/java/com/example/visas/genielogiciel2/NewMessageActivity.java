@@ -36,6 +36,7 @@ import com.example.visas.genielogiciel2.Model.Principal.Contact;
 import com.example.visas.genielogiciel2.Model.Principal.Groupe;
 import com.example.visas.genielogiciel2.Model.Principal.Message;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class NewMessageActivity extends AppCompatActivity {
@@ -157,18 +158,26 @@ public class NewMessageActivity extends AppCompatActivity {
 
                     String sim=PreferenceManager
                             .getDefaultSharedPreferences(getApplicationContext())
-                            .getString(c.getOperateur(), "0");
+                            .getString(c.getOperateur(), "7");
                     int slot=0;
                     Toast.makeText(getApplicationContext(),"Slot utilisé : "+sim+" numéro : "+c.getContactNumber(),Toast.LENGTH_LONG).show();
 
+                    //Method method = Class.forName("android.os.ServiceManager").getDeclaredMethod("getService", String.class);
                     SubscriptionManager subs = (SubscriptionManager) getSystemService(Context.TELEPHONY_SUBSCRIPTION_SERVICE);
+                    assert subs != null;
                     for (SubscriptionInfo s : subs.getActiveSubscriptionInfoList()) {
-                        if(s.getDisplayName().toString().matches(sim))
-                            Toast.makeText(getApplicationContext(),"slot : "+s.getSimSlotIndex(),Toast.LENGTH_LONG).show();
-                            slot=s.getSimSlotIndex();
+                        if(s.getDisplayName().toString().matches(sim)){
+                            //slot=s.getSimSlotIndex();
+                            Toast.makeText(getApplicationContext(),"slot : "+slot,Toast.LENGTH_LONG).show();
+                            SmsManager.getSmsManagerForSubscriptionId(s.getSubscriptionId()).sendTextMessage(c.contactNumberToString(), null, message.getMessageInfo(),sentPI,null);
+                        }
                     }
-                    SmsManager.getSmsManagerForSubscriptionId(slot).sendTextMessage(c.contactNumberToString(), null, message.getMessageInfo(), sentPI, null);
-
+                    //SmsManager.getSmsManagerForSubscriptionId(slot).sendTextMessage(c.contactNumberToString(), null, message.getMessageInfo(), sentPI, null);
+                    /*Toast.makeText(getApplicationContext(),"slot : "+slot,Toast.LENGTH_LONG).show();
+                    SubscriptionManager subscriptionManager=((Activity)getApplicationContext()).getSystemService(SubscriptionManager.class);
+                    assert subscriptionManager != null;
+                    SubscriptionInfo subscriptionInfo=subscriptionManager.getActiveSubscriptionInfoForSimSlotIndex(slot);
+                    SmsManager.getSmsManagerForSubscriptionId(subscriptionInfo.getSubscriptionId()).sendTextMessage(c.contactNumberToString(), null, message.getMessageInfo(),sentPI,null);*/
                 }
             }
             //---when the SMS has been sent---
@@ -176,9 +185,9 @@ public class NewMessageActivity extends AppCompatActivity {
                 @Override
                 public void onReceive(Context arg0, Intent arg1) {
                     if (getResultCode() == Activity.RESULT_OK) {
-                        message.setMessageIsSent(true);
-                        createMessage(message);
-                        Toast.makeText(getApplicationContext(),"Message envoyé",Toast.LENGTH_LONG).show();
+                            message.setMessageIsSent(true);
+                            createMessage(message);
+                            Toast.makeText(getApplicationContext(),"Message envoyé",Toast.LENGTH_LONG).show();
                         }
                         else
                             Toast.makeText(getApplicationContext(),"Echec envoi",Toast.LENGTH_LONG).show();
